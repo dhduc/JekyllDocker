@@ -12,8 +12,14 @@ YELLOW=`tput setaf 3`
 NORMAL=`tput sgr0`
 BOLD=`tput bold`
 
-echo "Start docker services"
-docker-compose up -d
+init() {
+	echo "Start docker services"
+	docker-compose up -d
+
+	if [ -n "$1" ]; then
+		PROJECT=$1
+	fi
+}
 
 jekyll_conf() {
 	JEKYLL_ID=$(docker ps | grep $APPNAME | awk '{print $1}')
@@ -75,5 +81,6 @@ nginx_conf() {
 	echo $GREEN Project http://$PROJECT loaded at $IP $ENDC
 }
 
+init
 # jekyll_conf
 nginx_conf
