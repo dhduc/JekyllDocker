@@ -72,7 +72,7 @@ nginx_conf() {
 		CMD="sudo sed -i '\$a\\\\n# Added automatically by run.sh\n"$IP" "$PROJECT"\n' /etc/hosts";
 	fi
 	
-	echo Nginx server loaded at $IP
+	echo Nginx server loaded at http://$IP
 	
 	eval $CMD
 	if [ "$?" -ne 0 ]; then
