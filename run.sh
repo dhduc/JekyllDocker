@@ -71,7 +71,9 @@ nginx_conf() {
 	else
 		CMD="sudo sed -i '\$a\\\\n# Added automatically by run.sh\n"$IP" "$PROJECT"\n' /etc/hosts";
 	fi
-
+	
+	echo Nginx server loaded at $IP
+	
 	eval $CMD
 	if [ "$?" -ne 0 ]; then
 		echo $RED ERROR: Could not update $PROJECT to hosts file. $ENDC
