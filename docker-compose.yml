@@ -3,6 +3,7 @@ services:
     jekyll:
         image: jekyll/jekyll:pages
         hostname: jekyll
+        container_name: jekyll
         command: jekyll build -w
         ports:
             - 4000:4000
@@ -11,6 +12,7 @@ services:
     nginx:
         image: nginx
         hostname: nginx
+        container_name: nginx
         ports:
             - 4010:80
         volumes:
