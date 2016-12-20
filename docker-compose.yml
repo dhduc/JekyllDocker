@@ -3,15 +3,9 @@ services:
     jekyll:
         image: jekyll/jekyll:pages
         hostname: jekyll
-        command: jekyll build -w
+        container_name: jekyll
+        command: jekyll serve
         ports:
             - 4000:4000
         volumes:
             - ./web:/srv/jekyll
-    nginx:
-        image: nginx
-        hostname: nginx
-        ports:
-            - 4010:80
-        volumes:
-            - ./web/_site:/usr/share/nginx/html

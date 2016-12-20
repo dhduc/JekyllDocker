@@ -4,6 +4,8 @@ WEB='web'
 PROJECT='jekyll.local'
 PORT='4000'
 APPNAME='jekyll/jekyll'
+VHOST='jekyll.conf'
+IP='127.0.0.1'
 
 ENDC=`tput setaf 7`
 RED=`tput setaf 1`
@@ -49,19 +51,17 @@ jekyll_conf() {
 }
 
 nginx_conf() {
-	NGINX_CONTAINER_ID=$(docker ps | grep 'nginx' | awk '{print $1}')
-	if [ -z "$NGINX_CONTAINER_ID" ]; then
-		echo $RED ERROR: Container \"$PROJECT\" could not be started. $ENDC
-		exit 1
-	fi
+	echo 'Setup Nginx virtual host'
 
-	IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $NGINX_CONTAINER_ID)
-	if [ -z "$IP" ]; then
-		echo $RED ERROR: Could not find the IP address of container \"$PROJECT\". $ENDC
-		exit 1
+	if [ -s nginx.conf ]; then
+		rm nginx.conf
 	fi
-
-	echo Attempting to update hosts file [May be need to root password]
+	cp nginx.conf.sample nginx.conf
+	sed -i "s/your_domain/${PROJECT}/g" nginx.conf
+	if [ -s /etc/nginx/conf.d/$VHOST ]; then
+		sudo rm -rf /etc/nginx/conf.d/$VHOST
+	fi
+	sudo cp nginx.conf /etc/nginx/conf.d/$VHOST	
 
 	CONDITION="grep -q '"$PROJECT"' /etc/hosts"
 	if eval $CONDITION; then
@@ -69,14 +69,14 @@ nginx_conf() {
 	else
 		CMD="sudo sed -i '\$a\\\\n# Added automatically by run.sh\n"$IP" "$PROJECT"\n' /etc/hosts";
 	fi
-	
-	echo Nginx server loaded at http://$IP
-	
+		
 	eval $CMD
 	if [ "$?" -ne 0 ]; then
 		echo $RED ERROR: Could not update $PROJECT to hosts file. $ENDC
 		exit 1
 	fi
+
+	sudo service nginx restart
 
 	echo $GREEN Project http://$PROJECT loaded at $IP $ENDC
 }
